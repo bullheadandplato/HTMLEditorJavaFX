@@ -24,7 +24,6 @@ public class Main extends Application {
         MainViewController controller = fxmlLoader.getController();
         controller.setStage(primaryStage);
         Scene scene = new Scene(group);
-        scene.getStylesheets().add(Main.class.getResource("KeywordStyle.css").toExternalForm());
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.setTitle("HTML make easy");

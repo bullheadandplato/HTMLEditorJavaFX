@@ -19,7 +19,7 @@ import java.io.IOException;
  * Controller for the fxml file.
  */
 public class MainViewController {
-    String template = "<!DOCTYPE html>\n" +
+    private String template = "<!DOCTYPE html>\n" +
             "<html lang=\"en\">\n" +
             "<head>\n" +
             "    <meta charset=\"UTF-8\">\n" +
@@ -33,22 +33,25 @@ public class MainViewController {
     private WebView webview;
     @FXML
     private CodeArea htmlEditor;
+
+
     private Stage stage;
 
     @FXML
     public void initialize() {
         htmlEditor.setParagraphGraphicFactory(LineNumberFactory.get(htmlEditor));
         htmlEditor.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
-                .subscribe(change -> {
-                    htmlEditor.setStyleSpans(0, HTMLKeywords.computeHighlighting(htmlEditor.getText()));
-                });
+                .subscribe(change -> htmlEditor.setStyleSpans(0, HTMLKeywords.computeHighlighting(htmlEditor.getText())));
         htmlEditor.insertText(0, template);
-
+        htmlEditor.textProperty().addListener(listen -> {
+            webview.getEngine().loadContent(htmlEditor.getText());
+        });
     }
 
     @FXML
     public void loadContent() {
         webview.getEngine().loadContent(htmlEditor.getText());
+
     }
 
     public void openFile(ActionEvent actionEvent) {
@@ -68,7 +71,7 @@ public class MainViewController {
         String temp = "";
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
-            String line = "";
+            String line;
             while ((line = br.readLine()) != null) {
                 temp += line + "\n";
             }
@@ -77,6 +80,14 @@ public class MainViewController {
             e.printStackTrace();
         }
         return temp;
+    }
+
+    public void close(ActionEvent actionEvent) {
+        System.exit(0);
+    }
+
+    public void createFile(ActionEvent actionEvent) {
+
     }
 
 }

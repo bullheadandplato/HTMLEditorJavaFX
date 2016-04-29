@@ -4,35 +4,80 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.WebView?>
 <?import org.fxmisc.richtext.CodeArea?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.72"
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      maxHeight="-Infinity"
+      maxWidth="-Infinity"
+      minHeight="-Infinity"
+      minWidth="-Infinity"
+      prefHeight="400.0"
+      prefWidth="600.0"
+      xmlns="http://javafx.com/javafx/8.0.72"
+      stylesheets="@/Stylesheets/MainStyle.css"
       fx:controller="com.backend.MainViewController">
     <children>
-        <MenuBar>
+        <MenuBar fx:id="menubar">
             <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu mnemonicParsing="false"
+                      text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#openFile" text="Open"/>
+                        <MenuItem text="New File"
+                                  mnemonicParsing="false"
+                                  onAction="#createFile"
+                        />
+                        <MenuItem mnemonicParsing="false"
+                                  onAction="#openFile"
+                                  text="Open"
+                        />
+                        <MenuItem mnemonicParsing="false"
+                                  onAction="#close" text="Close"
+                        />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
+                <Menu mnemonicParsing="false"
+                      text="Edit">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Delete"/>
+                        <MenuItem mnemonicParsing="false"
+                                  text="Delete"
+                        />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu mnemonicParsing="false"
+                      text="Help">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="About"/>
+                        <MenuItem mnemonicParsing="false"
+                                  text="About"
+                        />
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
-        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" VBox.vgrow="ALWAYS">
+        <HBox alignment="CENTER_LEFT"
+              prefHeight="100.0"
+              prefWidth="200.0"
+              spacing="10.0"
+              VBox.vgrow="ALWAYS">
             <children>
+                <CodeArea fx:id="htmlEditor"
+                          prefHeight="200.0"
+                          prefWidth="200.0"
+                          HBox.hgrow="ALWAYS"
+                          stylesheets="@/Stylesheets/KeywordStyle.css"
+                />
+                <VBox fx:id="actions">
+                    <children>
 
-                <CodeArea fx:id="htmlEditor" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
-                <Button mnemonicParsing="false" onAction="#loadContent" text="Load"/>
-                <WebView fx:id="webview" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+                        <Button mnemonicParsing="false"
+                                onAction="#loadContent"
+                                text="Load"
+                        />
+
+                    </children>
+                </VBox>
+
+                <WebView fx:id="webview"
+                         prefHeight="200.0"
+                         prefWidth="200.0"
+                         HBox.hgrow="ALWAYS"/>
             </children>
         </HBox>
     </children>

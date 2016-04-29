@@ -1,8 +1,11 @@
 package com.backend;
 
 import com.backend.editor.HTMLKeywords;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -33,19 +36,39 @@ public class MainViewController {
     private WebView webview;
     @FXML
     private CodeArea htmlEditor;
-
-
+    @FXML
+    private CheckBox toggleMode;
+    @FXML
+    private CheckBox darkBack;
+    private ChangeListener listenerEditor = new ChangeListener() {
+        @Override
+        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+            webview.getEngine().loadContent(htmlEditor.getText());
+        }
+    };
+    private ChangeListener listenerCheckBox = new ChangeListener() {
+        @Override
+        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+            if (!toggleMode.isSelected()) {
+                htmlEditor.textProperty().removeListener(listenerEditor);
+                htmlEditor.requestFocus();
+            } else {
+                htmlEditor.textProperty().addListener(listenerEditor);
+                htmlEditor.requestFocus();
+            }
+        }
+    };
     private Stage stage;
+
 
     @FXML
     public void initialize() {
         htmlEditor.setParagraphGraphicFactory(LineNumberFactory.get(htmlEditor));
-        htmlEditor.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
+        htmlEditor.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
                 .subscribe(change -> htmlEditor.setStyleSpans(0, HTMLKeywords.computeHighlighting(htmlEditor.getText())));
         htmlEditor.insertText(0, template);
-        htmlEditor.textProperty().addListener(listen -> {
-            webview.getEngine().loadContent(htmlEditor.getText());
-        });
+        toggleMode.selectedProperty().addListener(listenerCheckBox);
+
     }
 
     @FXML
@@ -54,6 +77,7 @@ public class MainViewController {
 
     }
 
+    @FXML
     public void openFile(ActionEvent actionEvent) {
         htmlEditor.replaceText(0, 0, "");
         FileChooser fileChooser = new FileChooser();
@@ -82,12 +106,22 @@ public class MainViewController {
         return temp;
     }
 
+    @FXML
     public void close(ActionEvent actionEvent) {
         System.exit(0);
     }
 
+    @FXML
     public void createFile(ActionEvent actionEvent) {
 
     }
 
+    @FXML
+    public void changeEditoBack(ActionEvent actionEvent) {
+        if (darkBack.isSelected()) {
+            htmlEditor.setStyle("-fx-fill: white; -fx-background-color: gray");
+        } else {
+            htmlEditor.setStyle("-fx-background-color: azure");
+        }
+    }
 }

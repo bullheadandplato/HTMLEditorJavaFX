@@ -15,42 +15,57 @@
       stylesheets="@/Stylesheets/MainStyle.css"
       fx:controller="com.backend.MainViewController">
     <children>
-        <MenuBar fx:id="menubar">
-            <menus>
-                <Menu mnemonicParsing="false"
-                      text="File">
-                    <items>
-                        <MenuItem text="New File"
-                                  mnemonicParsing="false"
-                                  onAction="#createFile"
-                        />
-                        <MenuItem mnemonicParsing="false"
-                                  onAction="#openFile"
-                                  text="Open"
-                        />
-                        <MenuItem mnemonicParsing="false"
-                                  onAction="#close" text="Close"
-                        />
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false"
-                      text="Edit">
-                    <items>
-                        <MenuItem mnemonicParsing="false"
-                                  text="Delete"
-                        />
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false"
-                      text="Help">
-                    <items>
-                        <MenuItem mnemonicParsing="false"
-                                  text="About"
-                        />
-                    </items>
-                </Menu>
-            </menus>
-        </MenuBar>
+        <HBox spacing="10.0"
+              alignment="CENTER_LEFT"
+        >
+            <children>
+                <MenuBar fx:id="menubar">
+                    <menus>
+                        <Menu mnemonicParsing="false"
+                              text="File">
+                            <items>
+                                <MenuItem text="New File"
+                                          mnemonicParsing="false"
+                                          onAction="#createFile"
+                                />
+                                <MenuItem mnemonicParsing="false"
+                                          onAction="#openFile"
+                                          text="Open"
+                                />
+                                <MenuItem mnemonicParsing="false"
+                                          onAction="#close" text="Close"
+                                />
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false"
+                              text="Edit">
+                            <items>
+                                <MenuItem mnemonicParsing="false"
+                                          text="Delete"
+                                />
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false"
+                              text="Help">
+                            <items>
+                                <MenuItem mnemonicParsing="false"
+                                          text="About"
+                                />
+                            </items>
+                        </Menu>
+
+                    </menus>
+
+                </MenuBar>
+                <CheckBox text="Realtime changes"
+                          fx:id="toggleMode"
+                />
+                <CheckBox text="Dark Editor"
+                          fx:id="darkBack"
+                          onAction="#changeEditoBack"
+                />
+            </children>
+        </HBox>
         <HBox alignment="CENTER_LEFT"
               prefHeight="100.0"
               prefWidth="200.0"
@@ -63,7 +78,7 @@
                           HBox.hgrow="ALWAYS"
                           stylesheets="@/Stylesheets/KeywordStyle.css"
                 />
-                <VBox fx:id="actions">
+                <VBox fx:id="actions" alignment="CENTER">
                     <children>
 
                         <Button mnemonicParsing="false"

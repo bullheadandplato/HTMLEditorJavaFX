@@ -62,5 +62,18 @@ public class HTMLKeywords {
         return spansBuilder.create();
     }
 
+    public static String autoComplete(String text) {
+        String match = "";
+        Matcher matcher = PATTERN.matcher(text);
+        while (matcher.find()) {
+            match = matcher.group("KEYWORD") != null ? "keyword" :
+                    null; /* this should never happen*/
+            return "not";
+
+        }
+        return match;
+    }
+
+
 }
 

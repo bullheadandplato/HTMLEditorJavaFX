@@ -28,6 +28,10 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("HTML make easy");
         primaryStage.show();
+        primaryStage.setOnCloseRequest(event -> {
+            controller.close();
+        });
+
 
     }
 }

@@ -1,3 +1,25 @@
 #htmlEditor {
     -fx-background-color: azure;
 }
+
+#load {
+    -fx-background-color: dodgerblue;
+    -fx-text-fill: white;
+
+}
+
+#load:hover {
+    -fx-border-radius: 10px;
+    -fx-background-color: cornflowerblue;
+}
+
+#topBar {
+    -fx-background-color: cornsilk;
+    -fx-border-radius: 10px;
+    -fx-text-fill: greenyellow;
+
+}
+
+.check-box:hover {
+    -fx-text-fill: dodgerblue;
+}

@@ -17,6 +17,7 @@
     <children>
         <HBox spacing="10.0"
               alignment="CENTER_LEFT"
+              fx:id="topBar"
         >
             <children>
                 <MenuBar fx:id="menubar">
@@ -32,6 +33,9 @@
                                           onAction="#openFile"
                                           text="Open"
                                 />
+                                <MenuItem text="Save"
+                                          onAction="#saveFile"
+                                          mnemonicParsing="false"/>
                                 <MenuItem mnemonicParsing="false"
                                           onAction="#close" text="Close"
                                 />
@@ -57,13 +61,25 @@
                     </menus>
 
                 </MenuBar>
+                <HBox alignment="CENTER"
+                >
+                    <Button mnemonicParsing="false"
+                            onAction="#loadContent"
+                            wrapText="true"
+                            text="Load"
+                            fx:id="load"
+                    />
+
+                </HBox>
+
                 <CheckBox text="Realtime changes"
                           fx:id="toggleMode"
                 />
                 <CheckBox text="Dark Editor"
                           fx:id="darkBack"
-                          onAction="#changeEditoBack"
+                          onAction="#changeEditorBack"
                 />
+
             </children>
         </HBox>
         <HBox alignment="CENTER_LEFT"
@@ -78,16 +94,6 @@
                           HBox.hgrow="ALWAYS"
                           stylesheets="@/Stylesheets/KeywordStyle.css"
                 />
-                <VBox fx:id="actions" alignment="CENTER">
-                    <children>
-
-                        <Button mnemonicParsing="false"
-                                onAction="#loadContent"
-                                text="Load"
-                        />
-
-                    </children>
-                </VBox>
 
                 <WebView fx:id="webview"
                          prefHeight="200.0"

@@ -6,6 +6,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.web.WebView;
@@ -14,17 +15,14 @@ import javafx.stage.Stage;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 
 /**
  * Created by osama on 4/28/16.
  * Controller for the fxml file.
  */
 public class MainViewController {
-    private static boolean fileStatus = false;
+    private static final String tempFile = "/tmp/temp.html";
     private String template = "<!DOCTYPE html>\n" +
             "<html lang=\"en\">\n" +
             "<head>\n" +
@@ -65,7 +63,7 @@ public class MainViewController {
         }
     };
     private Stage stage;
-    private String fileLocation;
+    private String fileLocation = "/tmp/temp.html";
     private FileHandler fileHandler;
 
     @FXML
@@ -76,7 +74,7 @@ public class MainViewController {
         toggleMode.selectedProperty().addListener(listenerCheckBox);
         //create the initial default file
         fileHandler = new FileHandler();
-        createFile();
+        fileHandler.createFile(fileLocation);
 
 /*TODO
         htmlEditor.textProperty().addListener(ch->{
@@ -105,27 +103,21 @@ public class MainViewController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open valid html file");
         File file = fileChooser.showOpenDialog(stage);
-        htmlEditor.replaceText(0, 0, fileData(file));
+        if (fileHandler.verifyFile(file.getAbsolutePath())) {
+            htmlEditor.replaceText(0, 0, fileHandler.getFileData(file));
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("Cannot open file");
+            alert.setContentText("File you have selected is not a valid HTML file");
+            alert.showAndWait();
+
+
+        }
 
     }
 
     public void setStage(Stage stage) {
         this.stage = stage;
-    }
-
-    private String fileData(File file) {
-        String temp = "";
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = br.readLine()) != null) {
-                temp += line + "\n";
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return temp;
     }
 
     @FXML
@@ -141,15 +133,41 @@ public class MainViewController {
     @FXML
     public void createFile() {
         FileChooser fc = new FileChooser();
-        File file = fc.showOpenDialog(stage);
+        File file = fc.showSaveDialog(stage);
         if (file.exists()) {
             fileLocation = file.getAbsolutePath();
+            //verify file name
+            if (!fileHandler.verifyFile(file.getAbsolutePath())) {
+                fileLocation.concat(".html");
+            }
+
+            //create and save file in file system.
             fileHandler.createFile(fileLocation);
-            System.out.println("html: " + htmlEditor.getText());
             fileHandler.saveFile(htmlEditor.getText());
-            fileStatus = true;
         }
 
+    }
+
+    @FXML
+    public void saveFile(ActionEvent actionEvent) {
+        //if it is automatically created file i, user not create file by itself
+        //file is default file created by program than give access to user to choose filename
+        //and save it.
+        if (fileLocation.equals(tempFile)) {
+            FileChooser fx = new FileChooser();
+            File f = fx.showSaveDialog(stage);
+            fileLocation = f.getAbsolutePath();
+            //verify file name
+            if (!fileHandler.verifyFile(fileLocation)) {
+                fileLocation.concat(".html");
+            }
+            //create and save file in filesystem.
+            fileHandler.createFile(fileLocation);
+            fileHandler.saveFile(htmlEditor.getText());
+        } else {
+            fileHandler.saveFile(htmlEditor.getText());
+
+        }
 
     }
 
@@ -160,16 +178,5 @@ public class MainViewController {
         } else {
             htmlEditor.setStyle("-fx-background-color: azure");
         }
-    }
-
-    @FXML
-    public void saveFile(ActionEvent actionEvent) {
-        //be sure to call create file before save file.
-        if (!fileStatus) {
-            createFile();
-        } else {
-            fileHandler.saveFile(htmlEditor.getText());
-        }
-
     }
 }

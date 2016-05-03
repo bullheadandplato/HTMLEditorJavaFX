@@ -1,9 +1,6 @@
 package com.backend.filehandling;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created by osama on 5/1/16.
@@ -64,4 +61,23 @@ public class FileHandler {
         }
     }
 
+    public boolean verifyFile(String fileLocation) {
+        //regex for file validation "[a-z\d A-Z\\/.]+.html"
+        return fileLocation.matches("[a-z\\d A-Z\\\\/.]+.html");
+    }
+
+    public String getFileData(File file) {
+        String temp = "";
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                temp += line + "\n";
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
 }

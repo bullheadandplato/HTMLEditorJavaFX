@@ -34,9 +34,8 @@ public class FileHandler {
             return writeFile(texts);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     private boolean writeFile(String texts) {

@@ -2,9 +2,9 @@ package com.backend;
 
 import com.backend.editor.HTMLKeywords;
 import com.backend.filehandling.FileHandler;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -23,16 +23,7 @@ import java.io.File;
  */
 public class MainViewController {
     private static final String tempFile = "/tmp/temp.html";
-    private String template = "<!DOCTYPE html>\n" +
-            "<html lang=\"en\">\n" +
-            "<head>\n" +
-            "    <meta charset=\"UTF-8\">\n" +
-            "    <title>Title</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "\n" +
-            "</body>\n" +
-            "</html>";
+
     @FXML
     private WebView webview;
     @FXML
@@ -43,10 +34,16 @@ public class MainViewController {
     private CheckBox darkBack;
     @FXML
     private Button load;
+
     private ChangeListener listenerEditor = new ChangeListener() {
         @Override
         public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-            webview.getEngine().loadContent(htmlEditor.getText());
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    webview.getEngine().loadContent(htmlEditor.getText());
+                }
+            });
         }
     };
     private ChangeListener listenerCheckBox = new ChangeListener() {
@@ -65,29 +62,20 @@ public class MainViewController {
     private Stage stage;
     private String fileLocation = "/tmp/temp.html";
     private FileHandler fileHandler;
+    private boolean autoCompleteText = true;
 
     @FXML
     public void initialize() {
         htmlEditor.setParagraphGraphicFactory(LineNumberFactory.get(htmlEditor));
         htmlEditor.richChanges().filter(ch -> !ch.getInserted().equals(ch.getRemoved()))
                 .subscribe(change -> htmlEditor.setStyleSpans(0, HTMLKeywords.computeHighlighting(htmlEditor.getText())));
-        toggleMode.selectedProperty().addListener(listenerCheckBox);
+        autoComplete();
+
         //create the initial default file
         fileHandler = new FileHandler();
         fileHandler.createFile(fileLocation);
+        toggleMode.selectedProperty().addListener(listenerCheckBox);
 
-/*TODO
-        htmlEditor.textProperty().addListener(ch->{
-            String abc="</";
-            if(htmlEditor.getText().equals("<")){
-                abc+=htmlEditor.getText(htmlEditor.getCaretPosition());
-            }
-            if(htmlEditor.getText(htmlEditor.getCaretPosition()).equalsIgnoreCase(">")){
-                htmlEditor.insertText(htmlEditor.getCaretPosition(),abc+">");
-            }
-
-        });
-        */
 
     }
 
@@ -138,7 +126,7 @@ public class MainViewController {
             fileLocation = file.getAbsolutePath();
             //verify file name
             if (!fileHandler.verifyFile(file.getAbsolutePath())) {
-                fileLocation.concat(".html");
+                fileLocation += ".html";
             }
 
             //create and save file in file system.
@@ -149,26 +137,46 @@ public class MainViewController {
     }
 
     @FXML
-    public void saveFile(ActionEvent actionEvent) {
+    public void saveFile() {
+        boolean temp = false;
         //if it is automatically created file i, user not create file by itself
         //file is default file created by program than give access to user to choose filename
         //and save it.
+        File f;
         if (fileLocation.equals(tempFile)) {
             FileChooser fx = new FileChooser();
-            File f = fx.showSaveDialog(stage);
-            fileLocation = f.getAbsolutePath();
-            //verify file name
-            if (!fileHandler.verifyFile(fileLocation)) {
-                fileLocation.concat(".html");
-            }
-            //create and save file in filesystem.
-            fileHandler.createFile(fileLocation);
-            fileHandler.saveFile(htmlEditor.getText());
-        } else {
-            fileHandler.saveFile(htmlEditor.getText());
+            try {
+                f = fx.showSaveDialog(stage);
+                fileLocation = f.getAbsolutePath();
+                //verify file name
+                if (!fileHandler.verifyFile(fileLocation)) {
+                    fileLocation += ".html";
+                }
+                //create and save file in filesystem.
+                fileHandler.createFile(fileLocation);
+                temp = fileHandler.saveFile(htmlEditor.getText());
 
+
+            } catch (Exception e) {
+                temp = false;
+            }
+        } else {
+            temp = fileHandler.saveFile(htmlEditor.getText());
         }
 
+
+        //show file saved alert
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        if (temp) {
+            a.setContentText("File successfully saved");
+            a.setHeaderText("File saved");
+        }
+        //this will never happened.
+        else {
+            a.setAlertType(Alert.AlertType.ERROR);
+            a.setHeaderText("Cannot save file");
+        }
+        a.showAndWait();
     }
 
     @FXML
@@ -178,5 +186,50 @@ public class MainViewController {
         } else {
             htmlEditor.setStyle("-fx-background-color: azure");
         }
+    }
+
+    private void autoComplete() {
+        htmlEditor.textProperty().addListener(r -> {
+            htmlEditor.setOnKeyPressed(abc -> {
+                if (abc.getCode().getName().equalsIgnoreCase("backspace")) {
+                    String a = htmlEditor.getText().substring(0, htmlEditor.getCaretPosition() - 1);
+                    a += htmlEditor.getText().substring(htmlEditor.getCaretPosition());
+                    int caret = htmlEditor.getCaretPosition();
+                    htmlEditor.replaceText(a);
+                    htmlEditor.positionCaret(caret - 1);
+                } else {
+
+                    Platform.runLater(() -> {
+                        int temp2 = htmlEditor.getCaretPosition() - 1;
+                        char temp = htmlEditor.getText().charAt(temp2);
+                        char temp3;
+                        int i = 0;
+                        if (temp == '>' && autoCompleteText) {
+                            autoCompleteText = false;
+                            for (i = 0; i < htmlEditor.getText().length(); i++) {
+                                temp3 = htmlEditor.getText().charAt(temp2 - i);
+                                if (temp3 == '<' && htmlEditor.getText().charAt(temp2 - i + 1) != '/') {
+                                    String tag = htmlEditor.getText().substring(temp2 - i + 1, temp2);
+                                    if (tag.equalsIgnoreCase("h1") || tag.equalsIgnoreCase("input")) {
+                                        htmlEditor.insertText(temp2, ">  </" + htmlEditor.getText(temp2 - i + 1, temp2));
+                                        break;
+                                    } else {
+                                        htmlEditor.insertText(temp2, ">\n\n</" + htmlEditor.getText(temp2 - i + 1, temp2));
+                                        break;
+                                    }
+                                } else if (temp3 == ' ') {
+
+                                }
+                            }
+                            return;
+                        } else {
+                            autoCompleteText = true;
+                        }
+
+                    });
+                }
+            });
+
+        });
     }
 }

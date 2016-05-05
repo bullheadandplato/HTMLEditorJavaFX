@@ -51,6 +51,7 @@ public class MainViewController {
         public void changed(ObservableValue observable, Object oldValue, Object newValue) {
             if (!toggleMode.isSelected()) {
                 htmlEditor.textProperty().removeListener(listenerEditor);
+                load.setDisable(false);
                 htmlEditor.requestFocus();
             } else {
                 htmlEditor.textProperty().addListener(listenerEditor);
